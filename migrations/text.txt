@@ -1,0 +1,28 @@
+Скачиваем migrate
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+-tags 'postgres': Это флаг для сборки с поддержкой PostgreSQL. (Также есть mysql, sqlite3, cockroachdb, mongodb и др. в зависимотсти от вашей БД)
+
+Создаем 2 файла:
+ - 000001_create-user-table.up.sql (для создания таблицы)
+ - 000001_create-user-table.down.sql (для отката изменений).
+
+migrate create -ext=.sql -seq -dir=./migrations create-user-table
+
+
+id: Уникальный идентификатор для каждого пользователя, автоматически увеличиваемый с помощью bigserial.
+created_at: отметка времени, когда пользователь был создан. Значение по умолчанию — текущая отметка времени.
+name: Имя пользователя, сохраненное в виде текста.
+phone_number: Номер телефона пользователя, сохранённый в виде уникального текста. Это гарантирует, что у двух пользователей не будет одинаковых номеров телефонов.
+versionЦелочисленный столбец, инициализированный значением 1, для управления оптимистичным контролем параллелизма, если это потребуется в будущих обновлениях.
+
+
+Чтобы применить миграцию к вашей базе данных PostgreSQL, выполните следующую команду
+migrate -path=./migrations -database="postgres://postgres:mysecretpassword@localhost:5432/postgres?sslmode=disable" up
+
+-path=./migrations: Указывает путь, по которому расположены файлы переноса.
+-database: Указывает строку подключения к базе данных PostgreSQL. При необходимости замените значения:
+user: Имя пользователя вашей базы данных (например, postgres).
+password: Пароль вашей базы данных (например, mysecretpassword).
+dbname: Имя вашей базы данных (например, cheershare).
+sslmode=disable: Отключает SSL для локальной разработки.
