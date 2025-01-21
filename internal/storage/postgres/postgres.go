@@ -140,17 +140,12 @@ func (s *Postgres) SetToken(token *models.Token) error {
 
 		stmt1, err2 := s.db.Prepare(`
 			INSERT INTO tokens (id_user, hash, expiry, id_api)
-			VALUES (
-				(SELECT id FROM users
-				WHERE phone_number = $1), $2, $3, $4)
+			VALUES ($1, $2, $3, $4)
 		`);
 
 		stmt2, err := s.db.Prepare(`
 			SELECT hash, expiry, id_api FROM tokens
-			WHERE id_user = (
-				SELECT id FROM users
-				WHERE phone_number = $1
-			) AND id_api = $2
+			WHERE id_user = $1 AND id_api = $2
 		`);
 
 		if err != nil || err2 != nil {
@@ -161,7 +156,7 @@ func (s *Postgres) SetToken(token *models.Token) error {
 		defer cancel();
 
 		err = stmt1.QueryRowContext(ctx, 
-				token.PhoneNumber, token.Hash,
+				token.IdUser, token.Hash,
 				token.Expiry, token.IdAPI).Err();
 
 		if err == nil {
@@ -174,7 +169,7 @@ func (s *Postgres) SetToken(token *models.Token) error {
 		}
 
 		//обновляем token, так как уже создан этим приложением
-		err = stmt2.QueryRowContext(ctx, token.PhoneNumber, token.IdAPI).Scan(
+		err = stmt2.QueryRowContext(ctx, token.IdUser, token.IdAPI).Scan(
 			&token.Hash,
 			&token.Expiry,
 			&token.IdAPI,

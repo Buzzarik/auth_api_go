@@ -61,7 +61,6 @@ func LoginHandlers(app *service.Application) http.HandlerFunc {
 		}
 
 		token, err := jwt.NewToken(user, app);
-		token.IdAPI = input.ID_API;
 
 		if err != nil {
 			app.ErrorResponse(w, http.StatusInternalServerError,
@@ -72,8 +71,9 @@ func LoginHandlers(app *service.Application) http.HandlerFunc {
 						slog.String("place", op));
 			return;
 		}
+		token.IdAPI = input.ID_API;
+		token.IdUser = user.ID;
 
-		//TODO: token save in DB
 		err = app.StorageToken.SetToken(token);
 
 		if err != nil {

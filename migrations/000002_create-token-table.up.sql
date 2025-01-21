@@ -9,16 +9,15 @@ CREATE TABLE IF NOT EXISTS tokens (
     UNIQUE (id_user, id_api)
 );
 
-CREATE OR REPLACE FUNCTION delete_expired_tokens()
-RETURNS TRIGGER AS $$
-BEGIN
-    DELETE FROM tokens WHERE expiry < NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION delete_expired_tokens()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     DELETE FROM tokens WHERE expiry < NOW();
+--     RETURN NULL; -- Для триггера типа AFTER INSERT возврат всегда NULL
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER before_update_tokens
-BEFORE UPDATE ON tokens
-FOR EACH ROW
-EXECUTE FUNCTION delete_expired_tokens();
-
+-- CREATE TRIGGER after_insert_tokens
+-- AFTER INSERT ON tokens
+-- FOR EACH STATEMENT
+-- EXECUTE FUNCTION delete_expired_tokens();
