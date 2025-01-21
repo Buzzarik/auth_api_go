@@ -15,7 +15,7 @@ type MyCustomClaims struct {
     Name        string `json:"name"`
     CreatedAt   time.Time `json:"created_at"`
     Exp         time.Time `json:"exp"`
-    IdUser      int64 `json:"id_user"`
+    IdUser      int `json:"id_user"`
 	jwt.RegisteredClaims
 }
 
@@ -39,7 +39,7 @@ func NewToken(user *models.User, app *service.Application) (*models.Token, error
 	return &models.Token{
 		Hash: tokenString,
 		Expiry: expiry,
-		IdAPI: app.Cnf.Server.IdAPI,
+		IdAPI: int(app.Cnf.Server.IdAPI),
 		PhoneNumber: user.PhoneNumber,
 		Name: user.Name,
 		IdUser: user.ID,
@@ -70,6 +70,6 @@ func DecodeToken(tokenString string, app *service.Application) (*models.Token, e
     }, nil
 }
 
-func VerifyToken(hash string, id_api int64, token *models.Token) bool {
+func VerifyToken(hash string, id_api int, token *models.Token) bool {
 	return token.Hash == hash && id_api == token.IdAPI;
 }

@@ -32,7 +32,7 @@ func SignupUserHandler(app *service.Application) http.HandlerFunc {
 
 		if input.Name == "" || input.PhoneNumber == "" || input.Password == "" {
 			app.ErrorResponse(w, http.StatusBadRequest,
-				"Name and phone and password number are required");
+				"Name, phone and password are required");
 			app.Log.Info("Error no content request");
 			return;
 		}
@@ -51,7 +51,7 @@ func SignupUserHandler(app *service.Application) http.HandlerFunc {
 
 		if user != nil {
 			app.ErrorResponse(w, http.StatusConflict,
-				"User already exists with the given phone number");
+				"User already exists");
 			app.Log.Info("User already exists",
 					slog.String("phone_number", input.PhoneNumber));
 			return;
@@ -105,6 +105,7 @@ func SignupUserHandler(app *service.Application) http.HandlerFunc {
 		app.Log.Debug("Generated OTP", 
 		slog.String("phone_number", input.PhoneNumber),
 		slog.String("OTP", otp));
+
 		err = app.WriteJSON(w, http.StatusOK, service.Envelope{
 			"success": true,
 			"message": "OTP sent successfully"},

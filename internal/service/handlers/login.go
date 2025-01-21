@@ -16,7 +16,7 @@ func LoginHandlers(app *service.Application) http.HandlerFunc {
 		var input struct{
 			PhoneNumber 	string 	`json:"phone_number"`
 			Password 		string 	`json:"password"`
-			ID_API			int64	`json:"id_api"`
+			ID_API			int	`json:"id_api"`
 		};
 
 		err := app.ReadJSON(w, r, &input);
@@ -53,9 +53,9 @@ func LoginHandlers(app *service.Application) http.HandlerFunc {
 
 
 		if user == nil || !my_hash.ComparePassword(user.HashPassword, input.Password){
-			app.ErrorResponse(w, http.StatusBadRequest,
-				"Wrong login or password");
-			app.Log.Info("Wrong login or password",
+			app.ErrorResponse(w, http.StatusNotFound,
+				"Invalid phone or password");
+			app.Log.Info("Invalid phone or password",
 					slog.String("phone_number", input.PhoneNumber));
 			return;
 		}
@@ -85,14 +85,14 @@ func LoginHandlers(app *service.Application) http.HandlerFunc {
 			return;
 		}
 
-		err = app.WriteJSON(w, http.StatusCreated, 
+		err = app.WriteJSON(w, http.StatusOK, 
 			service.Envelope{
 				"success": true,
-				"token": token,
-				"message": "Token created successfully",
+				"token": token.Hash,
+				"id_user": token.IdUser,
 			}, nil);
 		if err != nil {
-			app.ErrorResponse(w, http.StatusBadRequest,
+			app.ErrorResponse(w, http.StatusInternalServerError,
 				"Server internal error");
 			app.Log.Error("Error write JSON in response");
 			app.Log.Debug("Error write JSON in response",

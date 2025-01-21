@@ -49,17 +49,10 @@ func VerifyOTPHandler(app *service.Application) http.HandlerFunc {
 						slog.String("place", op));
 			return;
 		}
-		if len(userData) == 0 { //вышло время временного пароля
+		if len(userData) == 0 ||  input.OTP != userData["otp"] { //вышло время временного пароля
 			app.ErrorResponse(w, http.StatusNotFound,
-				"expired OTP");
-			app.Log.Info("expired OTP");
-			return;
-		}
-
-		if input.OTP != userData["otp"] {
-			app.ErrorResponse(w, http.StatusNotFound,
-				"Invalid OTP");
-			app.Log.Info("Invalid OTP");
+				"Invalid OTP or expiry");
+			app.Log.Info("Invalid OTP or expiry");
 			return;
 		}
 
@@ -71,10 +64,11 @@ func VerifyOTPHandler(app *service.Application) http.HandlerFunc {
 
 		err = app.StorageUser.SetUser(user);
 
+		//NOTE: может как-то по другому проверять constraint
 		if err != nil && err.Error() == constraint {
-			app.ErrorResponse(w, http.StatusBadRequest,
-				"User with phone_number already exests");
-			app.Log.Info("User with phone_number already exists");
+			app.ErrorResponse(w, http.StatusConflict,
+				"User already exists");
+			app.Log.Info("User already exists");
 			return;
 		}
 
@@ -91,13 +85,11 @@ func VerifyOTPHandler(app *service.Application) http.HandlerFunc {
 		err = app.WriteJSON(w, http.StatusCreated, 
 			service.Envelope{
 				"success": true,
-				"name":  user.Name,
-				"phone": user.PhoneNumber,
-				"message": "User registered successfully",
+				"message": "User is created",
 			}, nil);
 		
 		if err != nil {
-			app.ErrorResponse(w, http.StatusBadRequest,
+			app.ErrorResponse(w, http.StatusInternalServerError,
 				"Server internal error");
 			app.Log.Error("Error write JSON in response");
 			app.Log.Debug("Error write JSON in response",
