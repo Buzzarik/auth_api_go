@@ -59,6 +59,7 @@ func main() {
 	router.HandlerFunc(http.MethodPost, "/signup", handlers.SignupUserHandler(app));
 	router.HandlerFunc(http.MethodPost, "/register", handlers.VerifyOTPHandler(app));
 	router.HandlerFunc(http.MethodPost, "/login", handlers.LoginHandlers(app));
+	router.HandlerFunc(http.MethodPost, "/verify", handlers.VerifyTokenHandlers(app));
 
 	//TODO: Запустить сервер
 

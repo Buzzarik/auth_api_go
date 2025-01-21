@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/http"
 	_ "sync"
+	"time"
 )
 
 type Envelope map[string]interface{};
@@ -28,6 +29,8 @@ type StorageUser interface {
 type StorageToken interface {
 	//TODO: создать интерфейс для токенов
 	SetToken(token *models.Token) error
+    DeleteToken(now time.Time) error
+    SelectOneToken(id_user int, id_api int) (*models.Token, error)
 }
 
 type Application struct {

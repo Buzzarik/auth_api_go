@@ -182,3 +182,60 @@ func (s *Postgres) SetToken(token *models.Token) error {
 		return nil;
 	});
 }
+
+func (s *Postgres) DeleteToken(now time.Time) error {
+	const op = "Postgres.DeleteToken";
+	
+	stmt, err := s.db.Prepare(`
+		DELETE FROM tokens
+		WHERE expiry <= $1
+	`);
+
+	if err != nil {
+		return fmt.Errorf("(Prepare) %s : %w", op, err);
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 3);
+	defer cancel();
+
+	err = stmt.QueryRowContext(ctx, now).Err();
+
+	if err != nil {
+		return fmt.Errorf("(stmt) %s: %w", op, err);
+	}
+	return nil;
+}
+
+func (s *Postgres) SelectOneToken(id_user int, id_api int) (*models.Token, error) {
+	const op = "Postgres.SelectOneToken";
+
+	stmt, err := s.db.Prepare(`
+		SELECT hash, id_user, id_api, expiry FROM tokens
+		WHERE id_user = $1 AND id_api = $2
+	`);
+
+	if err != nil {
+		return nil, fmt.Errorf("(Prepare) %s: %w", op, err);
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 3);
+	defer cancel();
+
+	var token models.Token;
+	err = stmt.QueryRowContext(ctx, id_user, id_api).Scan(
+		&token.Hash,
+		&token.IdUser,
+		&token.IdAPI,
+		&token.Expiry,
+	);
+
+	if err == sql.ErrNoRows {
+		return nil, nil;
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("(stmt) %s: %w", op, err);
+	}
+
+	return &token, nil;
+}

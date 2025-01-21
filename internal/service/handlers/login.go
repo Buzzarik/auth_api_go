@@ -72,7 +72,6 @@ func LoginHandlers(app *service.Application) http.HandlerFunc {
 			return;
 		}
 		token.IdAPI = input.ID_API;
-		token.IdUser = user.ID;
 
 		err = app.StorageToken.SetToken(token);
 
