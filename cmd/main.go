@@ -56,10 +56,10 @@ func main() {
 	router := httprouter.New();
 
 	//TODO: Настроить маршруты
-	router.HandlerFunc(http.MethodPost, "/signup", handlers.SignupUserHandler(app));
-	router.HandlerFunc(http.MethodPost, "/register", handlers.VerifyOTPHandler(app));
-	router.HandlerFunc(http.MethodPost, "/login", handlers.LoginHandlers(app));
-	router.HandlerFunc(http.MethodPost, "/verify", handlers.VerifyTokenHandlers(app));
+	router.HandlerFunc(http.MethodPost, "/Signup", handlers.SignupUserHandler(app));
+	router.HandlerFunc(http.MethodPost, "/Register", handlers.VerifyOTPHandler(app));
+	router.HandlerFunc(http.MethodPost, "/Login", handlers.LoginHandlers(app));
+	router.HandlerFunc(http.MethodPost, "/Verify", handlers.VerifyTokenHandlers(app));
 
 	//TODO: Запустить сервер
 

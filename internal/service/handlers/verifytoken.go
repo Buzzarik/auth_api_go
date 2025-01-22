@@ -16,7 +16,6 @@ func VerifyTokenHandlers(app *service.Application) http.HandlerFunc {
 		var input struct {
 			HashToken 	string 	`json:"token"`
 			ID_API 		int 	`json:"id_api"`	
-			IdUser		int		`json:"id_user"`
 		};
 
 		err := app.ReadJSON(w, r, &input);

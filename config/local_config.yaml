@@ -20,9 +20,9 @@ postgres:
 
 server_auth:
   host:         "localhost"
-  port:         9999
+  port:         5555
   timeout:      4s
   idle_timeout: 30s
   secret:       "secret" # серкрет для токена
-  token_ttl:     20s # время для токена 1h потом поставить
+  token_ttl:     1h # время для токена 1h потом поставить
   id_api:       1
